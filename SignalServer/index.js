@@ -47,7 +47,7 @@ io.sockets.on('connection', function(socket) {
         log('收到创建或加入房间的请求，房间名：' + roomName);
 
         let clientsInRoom = io.sockets.adapter.rooms[roomName];
-        let numClients = clientsInRoom ? Object.keys(clientsInRoom.socket).length : 0;
+        let numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
         log(roomName + '房间目前有' + numClients + '个客户端');
 
         if (numClients === 0) {
