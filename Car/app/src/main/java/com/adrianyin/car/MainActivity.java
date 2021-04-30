@@ -7,7 +7,10 @@ import android.Manifest;
 import android.os.Bundle;
 
 import org.webrtc.Camera1Enumerator;
+import org.webrtc.DefaultVideoDecoderFactory;
+import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
+import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
@@ -68,12 +71,28 @@ public class MainActivity extends AppCompatActivity {
 
     // 创建peerConnectionFactory
     private void createPeerConnectionFactory() {
+
         PeerConnectionFactory.InitializationOptions initializationOptions =
                 PeerConnectionFactory.InitializationOptions
                         .builder(this)
                         .createInitializationOptions();
         PeerConnectionFactory.initialize(initializationOptions);
-        peerConnectionFactory = PeerConnectionFactory.builder().createPeerConnectionFactory();
+
+        PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
+        DefaultVideoEncoderFactory defaultVideoEncoderFactory =
+                new DefaultVideoEncoderFactory(eglBaseContext,
+                        true,
+                        true
+                );
+        DefaultVideoDecoderFactory defaultVideoDecoderFactory =
+                new DefaultVideoDecoderFactory(eglBaseContext);
+
+        peerConnectionFactory =
+                PeerConnectionFactory.builder()
+                        .setOptions(options)
+                        .setVideoEncoderFactory(defaultVideoEncoderFactory)
+                        .setVideoDecoderFactory(defaultVideoDecoderFactory)
+                        .createPeerConnectionFactory();
     }
 
     // 创建视频捕获器
@@ -83,16 +102,6 @@ public class MainActivity extends AppCompatActivity {
         for (String deviceName : deviceNames) {
             if (enumerator.isBackFacing(deviceName)) {
                 VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
-
-                if (videoCapturer != null) {
-                    return videoCapturer;
-                }
-            }
-        }
-        for (String deviceName : deviceNames) {
-            if (!enumerator.isBackFacing(deviceName)) {
-                VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
-
                 if (videoCapturer != null) {
                     return videoCapturer;
                 }
@@ -118,4 +127,6 @@ public class MainActivity extends AppCompatActivity {
         videoTrack = peerConnectionFactory.createVideoTrack("carCamera", videoSource);
         videoTrack.addSink(localView);
     }
+
+
 }
