@@ -1,0 +1,10 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#mapContainer {
+    width: 800px;
+    height: 600px;
+}

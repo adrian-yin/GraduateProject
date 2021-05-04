@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -22,7 +24,11 @@ import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 
-public class RemoteActivity extends AppCompatActivity {
+import org.json.JSONObject;
+
+public class RemoteActivity extends AppCompatActivity implements SocketClient.Callback {
+
+    private static final String TAG = "RemoteActivity";
 
     private Button toLocalButton;
     private MapView mapView;
@@ -34,6 +40,9 @@ public class RemoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remote);
         init();
+
+        // 连接socket服务器并绑定事件
+        SocketClient.get().setCallback(this);
 
         // 跳转至本地遥控页面按钮事件
         toLocalButton.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +76,12 @@ public class RemoteActivity extends AppCompatActivity {
         myLocationStyle.showMyLocation(true);
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setMyLocationEnabled(true);
+        aMap.setOnMyLocationChangeListener(new AMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location location) {
+                SocketClient.get().sendLocation(location);
+            }
+        });
     }
 
     private void init() {
@@ -96,5 +111,33 @@ public class RemoteActivity extends AppCompatActivity {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCommandReceived(JSONObject data) {
+        // 发送蓝牙命令
+        Log.d(TAG, "onCommandReceived");
+        String command = data.optString("command");
+        MyBluetooth.get().writeSerial(command);
+    }
+
+    @Override
+    public void onCreateRoom() {
+        Log.d(TAG, "onCreateRoom");
+    }
+
+    @Override
+    public void onSelfJoined() {
+        Log.d(TAG, "onSelfJoined");
+    }
+
+    @Override
+    public void onPeerJoined() {
+        Log.d(TAG, "onPeerJoined");
+    }
+
+    @Override
+    public void onPeerLeave(String message) {
+        Log.d(TAG, "onPeerLeave");
     }
 }

@@ -1,11 +1,10 @@
-package com.adrianyin.car;
+package com.adrianyin.arduinocar;
 
+import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.IceCandidate;
-import org.webrtc.SessionDescription;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -78,23 +77,18 @@ public class SocketClient {
             });
             socket.on("message", args -> {
                 Log.i(TAG, "收到消息：" + Arrays.toString(args));
-                Object arg = args[0];
-                if (arg instanceof JSONObject) {
-                    JSONObject data = (JSONObject) arg;
+                try {
+                    JSONObject data = new JSONObject(args[0].toString());
                     String type = data.optString("type");
                     switch (type) {
-                        case "offer":
-                            callback.onOfferReceived(data);
-                            break;
-                        case "answer":
-                            callback.onAnswerReceived(data);
-                            break;
-                        case "candidate":
-                            callback.onIceCandidateReceived(data);
+                        case "command":
+                            callback.onCommandReceived(data);
                             break;
                         default:
                             break;
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             });
 
@@ -103,29 +97,14 @@ public class SocketClient {
         }
     }
 
-    // 发送候选人信息
-    public void sendIceCandidate(IceCandidate iceCandidate) {
-        JSONObject message = new JSONObject();
+    public void sendLocation(Location location) {
+        JSONObject data = new JSONObject();
         try {
-            message.put("type", "candidate");
-            message.put("label", iceCandidate.sdpMLineIndex);
-            message.put("id", iceCandidate.sdpMid);
-            message.put("candidate", iceCandidate.sdp);
+            data.put("type", "location");
+            data.put("longitude", location.getLongitude());
+            data.put("latitude", location.getLatitude());
 
-            socket.emit("message", message);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // 发送Sdp信息
-    public void sendSessionDescription(SessionDescription sdp) {
-        JSONObject message = new JSONObject();
-        try {
-            message.put("type", sdp.type.canonicalForm());
-            message.put("sdp", sdp.description);
-
-            socket.emit("message", message);
+            socket.emit("message", data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -133,10 +112,7 @@ public class SocketClient {
 
     // 事件回调函数接口
     public interface Callback {
-
-        void onOfferReceived(JSONObject data);
-        void onAnswerReceived(JSONObject data);
-        void onIceCandidateReceived(JSONObject data);
+        void onCommandReceived(JSONObject data);
 
         void onCreateRoom();
         void onSelfJoined();

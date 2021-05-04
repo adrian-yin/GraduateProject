@@ -44,4 +44,12 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    // EasyPermissions动态权限申请
+    implementation 'pub.devrel:easypermissions:3.0.0'
+    // socket.io
+    implementation('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
 }
