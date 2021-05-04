@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Arduino Car</string>
+    <string name="connect">连接</string>
+    <string name="localControl">本地遥控</string>
+    <string name="forwardButton">前进按键</string>
+    <string name="leftButton">左转按键</string>
+    <string name="rightButton">右转按键</string>
+    <string name="backwardButton">后退按键</string>
+    <string name="remoteControl">远程控制</string>
+</resources>

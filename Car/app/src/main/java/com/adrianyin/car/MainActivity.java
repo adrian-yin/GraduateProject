@@ -9,7 +9,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 import org.webrtc.Camera1Enumerator;
-import org.webrtc.DataChannel;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
@@ -18,8 +17,6 @@ import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
-import org.webrtc.RtpReceiver;
-import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
@@ -27,15 +24,12 @@ import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements SocketClient.Callback {
-
-    private static final String TAG = "MainActivity";
 
     SurfaceViewRenderer localView;
     SurfaceViewRenderer remoteView;
@@ -92,13 +86,13 @@ public class MainActivity extends AppCompatActivity implements SocketClient.Call
         eglBaseContext = EglBase.create().getEglBaseContext();
 
         localView = findViewById(R.id.localView);
-        localView.setMirror(true);
+        localView.setMirror(false);
         localView.setKeepScreenOn(true);
         localView.setEnableHardwareScaler(false);
         localView.init(eglBaseContext, null);
 
         remoteView = findViewById(R.id.remoteView);
-        remoteView.setMirror(true);
+        remoteView.setMirror(false);
         remoteView.setKeepScreenOn(true);
         remoteView.setEnableHardwareScaler(false);
         remoteView.init(eglBaseContext, null);
@@ -173,8 +167,10 @@ public class MainActivity extends AppCompatActivity implements SocketClient.Call
                         .builder("stun:stun.l.google.com:19302")
                         .createIceServer()
         );
+        PeerConnection.RTCConfiguration rtcConfiguration =
+                new PeerConnection.RTCConfiguration(iceServers);
         peerConnection = peerConnectionFactory.createPeerConnection(
-                iceServers,
+                rtcConfiguration,
                 new PeerConnectionAdapter() {
                     @Override
                     public void onIceCandidate(IceCandidate iceCandidate) {

@@ -8,6 +8,8 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.RtpReceiver;
 
+import java.util.Arrays;
+
 public class PeerConnectionAdapter implements PeerConnection.Observer {
 
     private static final String TAG = "PeerConnectionAdapter";
@@ -39,7 +41,7 @@ public class PeerConnectionAdapter implements PeerConnection.Observer {
 
     @Override
     public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
-        Log.i(TAG, "onIceCandidatesRemoved: " + iceCandidates);
+        Log.i(TAG, "onIceCandidatesRemoved: " + Arrays.toString(iceCandidates));
     }
 
     @Override
@@ -64,7 +66,7 @@ public class PeerConnectionAdapter implements PeerConnection.Observer {
 
     @Override
     public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
-        Log.i(TAG, "onAddTrack: " + mediaStreams);
+        Log.i(TAG, "onAddTrack: " + Arrays.toString(mediaStreams));
     }
 
 }

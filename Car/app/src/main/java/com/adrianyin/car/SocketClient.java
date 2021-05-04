@@ -8,14 +8,7 @@ import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -30,25 +23,6 @@ public class SocketClient {
     private Callback callback;
 
     private final String roomName = "car";
-
-    private final TrustManager[] trustAll = new TrustManager[] {
-            new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    Log.i(TAG, "checkClientTrusted");
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    Log.i(TAG, "checkServerTrusted");
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-            }
-    };
 
     // 构造时初始化
     private SocketClient() {
@@ -73,15 +47,12 @@ public class SocketClient {
 
     private void init() {
         try {
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAll, null);
-            IO.setDefaultHostnameVerifier(((hostname, session) -> true));
-            IO.setDefaultSSLContext(sslContext);
-
+            IO.Options options = new IO.Options();
+            SocketSSL.set(options);
             // 建立到信令服务器的连接
-            String serverURI = "https://yinxu.monster:9123?userType=car";
-            socket = IO.socket(serverURI);
-            socket.connect();
+            String serverURI = "https://yinxu.monster:9123";
+            socket = IO.socket(serverURI, options);
+            socket = socket.connect();
             // 发送创建或加入指定房间的要求
             socket.emit("create or join", roomName);
 
@@ -127,7 +98,7 @@ public class SocketClient {
                 }
             });
 
-        } catch (NoSuchAlgorithmException | KeyManagementException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
     }
