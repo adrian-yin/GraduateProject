@@ -7,4 +7,7 @@
     <string name="rightButton">右转按键</string>
     <string name="backwardButton">后退按键</string>
     <string name="remoteControl">远程控制</string>
+
+    <string name="agora_app_id">1d4aa706feb74050a7a7eafd831bca1a</string>
+    <string name="agora_token">0061d4aa706feb74050a7a7eafd831bca1aIAABuJOCNx7K5lyWa1LIkw/lQJ/GCCYd75tu9D0UdOeV3wx+f9gAAAAAEACkGjsKJLKSYAEAAQAkspJg</string>
 </resources>

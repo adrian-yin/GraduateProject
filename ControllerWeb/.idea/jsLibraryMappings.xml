@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{socket.io-2.0.4.slim}" />
+    <file url="PROJECT" libraries="{AgoraRTCSDK-3.5.2, socket.io-2.0.4.slim}" />
   </component>
 </project>

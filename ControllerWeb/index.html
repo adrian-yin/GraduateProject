@@ -4,115 +4,21 @@
     <meta charset="UTF-8">
     <meta name="author" content="Yin Xu">
     <title>小车控制端</title>
-
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
+    <h1>小车控制台</h1>
+
     <div id="mapContainer"></div>
+
+    <div id="videoContainer"></div>
 
     <script type="text/javascript"
             src="https://webapi.amap.com/maps?v=2.0&key=6aa5b3b9bc4fdd776b4319625241bca0">
     </script>
     <script src="https://cdn.socket.io/socket.io-2.0.4.slim.js"></script>
-    <script>
-        // 绘制地图
-        const map = new AMap.Map(document.getElementById('mapContainer'), {
-            zoom: 18.5,
-            viewMode: '2D',
-            lang: 'zh_cn'
-        });
-
-        let marker;
-        function setMyLocation(longitude, latitude) {
-            if (marker) {
-                map.remove(marker);
-            }
-            marker = new AMap.Marker({
-                position: new AMap.LngLat(longitude, latitude),
-                title: '小车位置'
-            });
-            map.add(marker);
-            map.setCenter([longitude, latitude]);
-        }
-
-        // 房间名
-        const roomName = "car";
-
-        const socket = io.connect('https://yinxu.monster:9123');
-        socket.on('connect', function() {
-            socket.emit('create or join', roomName);
-            socket.on('created', function() {
-                console.log('成功创建房间');
-            });
-            socket.on('full', function() {
-                console.log('加入房间失败，房间已满');
-            });
-            socket.on('join', function() {
-                console.log('有节点加入房间');
-            });
-            socket.on('joined', function() {
-                console.log('成功加入房间');
-            });
-            socket.on('log', function(args) {
-                console.log('服务器日志信息' + args);
-            });
-            socket.on('bye', function() {
-                console.log('有节点退出房间');
-            });
-            socket.on('message', function(args) {
-                let type = args.type;
-                let longitude = args.longitude;
-                let latitude = args.latitude;
-                console.log(type);
-                switch (type) {
-                    case 'location':
-                        setMyLocation(longitude, latitude);
-                        break;
-                    default:
-                        break;
-                }
-            });
-
-            // 绑定按键发送指令
-            let currentCommand = '';
-            function sendCommand(command) {
-                if (command !== currentCommand) {
-                    console.log('here');
-                    let data = JSON.stringify({
-                        type: 'command',
-                        command: command
-                    });
-                    socket.emit('message', data);
-                    currentCommand = command;
-                }
-            }
-
-            document.addEventListener('keydown', function(event) {
-                switch (event.key) {
-                    case 'w': case 'W':
-                        sendCommand('w');
-                        break;
-                    case 'x': case 'X':
-                        sendCommand('x');
-                        break;
-                    case 'a': case 'A':
-                        sendCommand('a');
-                        break;
-                    case 'd': case 'D':
-                        sendCommand('d');
-                        break;
-                    default:
-                        break;
-                }
-            });
-            document.addEventListener('keyup', function(event) {
-                const controlKey = ['w', 'W', 'x', 'X', 'a', 'A', 'd', 'D'];
-                if (controlKey.indexOf(event.key) !== -1) {
-                    sendCommand('s');
-                }
-            });
-        });
-    </script>
+    <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.5.2.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
